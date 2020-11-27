@@ -108,13 +108,19 @@ function love.load()
     -- player who won the game; not set to a proper value until we reach
     -- that state in the game
     winningPlayer = 0
-
+    
+    -- GAME MODES
+    -- 1 PLAYER VS PLAYER
+    -- 2 PLAYER VS COMPUTER
+    gamemode = ''
+    
     -- the state of our game; can be any of the following:
     -- 1. 'start' (the beginning of the game, before first serve)
     -- 2. 'serve' (waiting on a key press to serve the ball)
     -- 3. 'play' (the ball is in play, bouncing between paddles)
     -- 4. 'done' (the game is over, with a victor, ready for restart)
-    gameState = 'start'
+    -- 5. 'menu' (this is the part where player picks the game mode)
+    gameState = 'menu'
 end
 
 --[[
@@ -269,7 +275,7 @@ function love.keypressed(key)
         love.event.quit()
     -- if we press enter during either the start or serve phase, it should
     -- transition to the next appropriate state
-    elseif key == 'enter' or key == 'return' then
+    elseif key == 'enter' or key == 'return' or key == 'space' then
         if gameState == 'start' then
             gameState = 'serve'
         elseif gameState == 'serve' then
@@ -293,6 +299,16 @@ function love.keypressed(key)
             end
         end
     end
+    
+    if gameState == 'menu' then
+        if key == '1'  then
+            gamemode = 'pvp'
+            gameState = 'start'
+        elseif key == '2' then
+            gamemode = 'pvc'
+            gameState = 'start'
+        end
+    end
 end
 
 --[[
@@ -303,20 +319,20 @@ function love.draw()
     -- begin drawing with push, in our virtual resolution
     push:start()
 
-    love.graphics.clear(40, 45, 52, 255)
+    love.graphics.clear(0.1569, 0.1765, 0.2039, 1)
     
     -- render different things depending on which part of the game we're in
     if gameState == 'start' then
         -- UI messages
         love.graphics.setFont(smallFont)
         love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press Enter to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press Enter or Space to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
     elseif gameState == 'serve' then
         -- UI messages
         love.graphics.setFont(smallFont)
         love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
             0, 10, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press Enter to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
     elseif gameState == 'play' then
         -- no UI messages to display in play
     elseif gameState == 'done' then
@@ -325,15 +341,24 @@ function love.draw()
         love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
             0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.setFont(smallFont)
-        love.graphics.printf('Press Enter to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+    elseif gameState == 'menu' then
+        love.graphics.setFont(largeFont)
+        love.graphics.printf('Choose a mode',0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.setFont(smallFont)
+        love.graphics.printf('1. Player vs Player \n 2. Player vs Computer' , 0, 50, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press escape to quit.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'right')
     end
 
     -- show the score before ball is rendered so it can move over the text
+    if gameState ~= 'menu' then
     displayScore()
     
     player1:render()
     player2:render()
     ball:render()
+
+    end
 
     -- display FPS for debugging; simply comment out to remove
     displayFPS()
@@ -360,8 +385,8 @@ end
 function displayFPS()
     -- simple FPS display across all states
     love.graphics.setFont(smallFont)
-    love.graphics.setColor(0, 255, 0, 255)
+    love.graphics.setColor(0, 1, 0, 1)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(1, 1, 1, 1)
 end
 
