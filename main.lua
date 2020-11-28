@@ -39,6 +39,7 @@ require 'Paddle'
 -- but which will mechanically function very differently
 require 'Ball'
 
+
 -- size of our actual window
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -96,6 +97,7 @@ function love.load()
 
     -- place a ball in the middle of the screen
     ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
+
 
     -- initialize score variables
     player1Score = 0
@@ -232,25 +234,49 @@ function love.update(dt)
     end
 
     --
-    -- paddles can move no matter what state we're in
-    --
-    -- player 1
-    if love.keyboard.isDown('w') then
-        player1.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('s') then
-        player1.dy = PADDLE_SPEED
-    else
-        player1.dy = 0
+    -- paddles can't move in 'menu' state
+    -- checks if gamemode is player vs player
+    if gamemode == 'pvp' then
+      -- player 1
+        if love.keyboard.isDown('w') then
+            player1.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('s') then
+            player1.dy = PADDLE_SPEED
+        else
+            player1.dy = 0
+        end
+
+        -- player 2
+        if love.keyboard.isDown('up') then
+            player2.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('down') then
+            player2.dy = PADDLE_SPEED
+        else
+            player2.dy = 0
+        end
+
+    --checks if game mode is player vs computer    
+    elseif gamemode == 'pvc' then
+        -- player 1
+        if love.keyboard.isDown('w') then
+            player1.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('s') then
+            player1.dy = PADDLE_SPEED
+        else
+            player1.dy = 0
+        end
+
+        -- player 2
+        if player2.y + player2.height/2 > ball.y + ball.height then
+            player2.dy = -PADDLE_SPEED
+        elseif player2.y + player2.height/2 < ball.y then
+            player2.dy = PADDLE_SPEED
+        else
+            player2.dy = 0
+        end
+
     end
 
-    -- player 2
-    if love.keyboard.isDown('up') then
-        player2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then
-        player2.dy = PADDLE_SPEED
-    else
-        player2.dy = 0
-    end
 
     -- update our ball based on its DX and DY only if we're in play state;
     -- scale the velocity by dt so movement is framerate-independent
@@ -342,6 +368,8 @@ function love.draw()
             0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.setFont(smallFont)
         love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+
+    --for the menu
     elseif gameState == 'menu' then
         love.graphics.setFont(largeFont)
         love.graphics.printf('Choose a mode',0, 10, VIRTUAL_WIDTH, 'center')
