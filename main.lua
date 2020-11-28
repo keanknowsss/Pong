@@ -231,61 +231,65 @@ function love.update(dt)
                 ball:reset()
             end
         end
+        --
+        -- paddles can't move in 'menu' state
+        -- checks if gamemode is player vs player
+        if gamemode == 'pvp' then
+            -- player 1
+            if love.keyboard.isDown('w') then
+                player1.dy = -PADDLE_SPEED
+            elseif love.keyboard.isDown('s') then
+                player1.dy = PADDLE_SPEED
+            else
+                player1.dy = 0
+            end
+  
+            -- player 2
+            if love.keyboard.isDown('up') then
+                player2.dy = -PADDLE_SPEED
+            elseif love.keyboard.isDown('down') then
+                player2.dy = PADDLE_SPEED
+            else
+                player2.dy = 0
+            end
+  
+        --checks if game mode is player vs computer    
+        elseif gamemode == 'pvc' then
+            -- player 1
+            if love.keyboard.isDown('w') then
+                player1.dy = -PADDLE_SPEED
+            elseif love.keyboard.isDown('s') then
+                player1.dy = PADDLE_SPEED
+            else
+                player1.dy = 0
+            end
+  
+            -- player 2
+            -- AI will only move if the ball is coming towards it
+            -- slight delay till the ball reaches an imaginary line(1/4 of the game width) to make the AI move
+            if ball.dx > 0 and ball.x >= VIRTUAL_WIDTH/4 then
+             
+         
+                if ball.x + ball.width > 0 and ball.x < VIRTUAL_WIDTH then
+                    if player2.y + player2.height/2 > ball.y + ball.height then
+                        player2.dy = -PADDLE_SPEED
+                    elseif player2.y + player2.height/2 < ball.y then
+                        player2.dy = PADDLE_SPEED
+                    else
+                        player2.dy = 0
+                    end
+                end                  
+            end
+           
+        end
+
+        -- update our ball based on its DX and DY only if we're in play state;
+        -- scale the velocity by dt so movement is framerate-independent
+        ball:update(dt) 
+
+        player1:update(dt)
+        player2:update(dt)
     end
-
-    --
-    -- paddles can't move in 'menu' state
-    -- checks if gamemode is player vs player
-    if gamemode == 'pvp' then
-      -- player 1
-        if love.keyboard.isDown('w') then
-            player1.dy = -PADDLE_SPEED
-        elseif love.keyboard.isDown('s') then
-            player1.dy = PADDLE_SPEED
-        else
-            player1.dy = 0
-        end
-
-        -- player 2
-        if love.keyboard.isDown('up') then
-            player2.dy = -PADDLE_SPEED
-        elseif love.keyboard.isDown('down') then
-            player2.dy = PADDLE_SPEED
-        else
-            player2.dy = 0
-        end
-
-    --checks if game mode is player vs computer    
-    elseif gamemode == 'pvc' then
-        -- player 1
-        if love.keyboard.isDown('w') then
-            player1.dy = -PADDLE_SPEED
-        elseif love.keyboard.isDown('s') then
-            player1.dy = PADDLE_SPEED
-        else
-            player1.dy = 0
-        end
-
-        -- player 2
-        if player2.y + player2.height/2 > ball.y + ball.height then
-            player2.dy = -PADDLE_SPEED
-        elseif player2.y + player2.height/2 < ball.y then
-            player2.dy = PADDLE_SPEED
-        else
-            player2.dy = 0
-        end
-
-    end
-
-
-    -- update our ball based on its DX and DY only if we're in play state;
-    -- scale the velocity by dt so movement is framerate-independent
-    if gameState == 'play' then
-        ball:update(dt)
-    end
-
-    player1:update(dt)
-    player2:update(dt)
 end
 
 --[[
