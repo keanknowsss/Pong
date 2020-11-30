@@ -81,8 +81,7 @@ function love.load()
         ['wall_hit'] = love.audio.newSource('sounds/wall_hit.wav', 'static'),
         ['bgm'] = love.audio.newSource('sounds/bgm.wav', 'static'),
         ['intro'] = love.audio.newSource('sounds/intro.wav', 'static'),
-        ['win'] = love.audio.newSource('sounds/win.wav', 'static'),
-        ['lose'] = love.audio.newSource('sounds/lose.wav', 'static')
+        ['win'] = love.audio.newSource('sounds/win.wav', 'static')
     }
     sounds['intro']:play()
     
