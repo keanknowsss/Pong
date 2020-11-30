@@ -78,8 +78,13 @@ function love.load()
     sounds = {
         ['paddle_hit'] = love.audio.newSource('sounds/paddle_hit.wav', 'static'),
         ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
-        ['wall_hit'] = love.audio.newSource('sounds/wall_hit.wav', 'static')
+        ['wall_hit'] = love.audio.newSource('sounds/wall_hit.wav', 'static'),
+        ['bgm'] = love.audio.newSource('sounds/bgm.wav', 'static'),
+        ['intro'] = love.audio.newSource('sounds/intro.wav', 'static'),
+        ['win'] = love.audio.newSource('sounds/win.wav', 'static'),
+        ['lose'] = love.audio.newSource('sounds/lose.wav', 'static')
     }
+    sounds['intro']:play()
     
     -- initialize our virtual resolution, which will be rendered within our
     -- actual window no matter its dimensions
@@ -209,6 +214,8 @@ function love.update(dt)
             -- if we've reached a score of 10, the game is over; set the
             -- state to done so we can show the victory message
             if player2Score == 10 then
+                sounds['win']:play()
+                sounds['bgm']:stop()
                 winningPlayer = 2
                 gameState = 'done'
             else
@@ -224,6 +231,8 @@ function love.update(dt)
             sounds['score']:play()
 
             if player1Score == 10 then
+                sounds['win']:play()
+                sounds['bgm']:stop()
                 winningPlayer = 1
                 gameState = 'done'
             else
@@ -334,7 +343,13 @@ function love.keypressed(key)
         if key == '1'  then
             gamemode = 'pvp'
             gameState = 'start'
+            sounds['bgm']:setLooping(true)
+            sounds['bgm']:stop()
+            sounds['bgm']:play()
         elseif key == '2' then
+            sounds['bgm']:setLooping(true)
+            sounds['bgm']:stop()
+            sounds['bgm']:play()
             gamemode = 'pvc'
             gameState = 'start'
         end
