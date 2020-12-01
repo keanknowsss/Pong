@@ -79,9 +79,9 @@ function love.load()
         ['paddle_hit'] = love.audio.newSource('sounds/paddle_hit.wav', 'static'),
         ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
         ['wall_hit'] = love.audio.newSource('sounds/wall_hit.wav', 'static'),
-        ['bgm'] = love.audio.newSource('sounds/bgm.wav', 'static'),
         ['intro'] = love.audio.newSource('sounds/intro.wav', 'static'),
-        ['win'] = love.audio.newSource('sounds/win.wav', 'static')
+        ['win'] = love.audio.newSource('sounds/win.wav', 'static'),
+        ['bgm'] = love.audio.newSource('sounds/bgm.wav','static')
     }
     sounds['intro']:play()
     
