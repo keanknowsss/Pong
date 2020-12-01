@@ -309,8 +309,17 @@ end
 function love.keypressed(key)
     -- `key` will be whatever key this callback detected as pressed
     if key == 'escape' then
-        -- the function LÖVE2D uses to quit the application
-        love.event.quit()
+        if gameState ~= 'menu' then
+            ball:reset()
+            -- reset scores to 0
+            player1Score = 0
+            player2Score = 0
+            servingPlayer = 1
+            gameState = 'menu'
+
+        else
+            love.event.quit()
+        end
     -- if we press enter during either the start or serve phase, it should
     -- transition to the next appropriate state
     elseif key == 'enter' or key == 'return' or key == 'space' then
@@ -368,15 +377,25 @@ function love.draw()
     -- render different things depending on which part of the game we're in
     if gameState == 'start' then
         -- UI messages
-        love.graphics.setFont(smallFont)
-        love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press Enter or Space to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
+        if gamemode == 'pvp' then
+            love.graphics.setFont(smallFont)
+            love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
+            love.graphics.printf('Press Enter or Space to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
+            love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+        else
+            love.graphics.setFont(smallFont)
+            love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
+            love.graphics.printf('Player = Left Side \n Controls = W and S', 0, 20, VIRTUAL_WIDTH, 'center')
+            love.graphics.printf('Press Enter or Space to begin!', 0, 40, VIRTUAL_WIDTH, 'center')
+            love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+        end
     elseif gameState == 'serve' then
         -- UI messages
         love.graphics.setFont(smallFont)
         love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
             0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
     elseif gameState == 'play' then
         -- no UI messages to display in play
     elseif gameState == 'done' then
@@ -386,6 +405,7 @@ function love.draw()
             0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.setFont(smallFont)
         love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
 
     --for the menu
     elseif gameState == 'menu' then
@@ -393,7 +413,7 @@ function love.draw()
         love.graphics.printf('Choose a mode',0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.setFont(smallFont)
         love.graphics.printf('1. Player vs Player \n 2. Player vs Computer' , 0, 50, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press escape to quit.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'right')
+        love.graphics.printf('Press escape to quit.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
     end
 
     -- show the score before ball is rendered so it can move over the text
