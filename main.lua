@@ -97,7 +97,7 @@ function love.load()
     -- initialize our player paddles; make them global so that they can be
     -- detected by other functions and modules
     player1 = Paddle(10, 30, 5, 20)
-    player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
+    player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 50, 5, 20)
 
     -- place a ball in the middle of the screen
     ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
@@ -120,12 +120,30 @@ function love.load()
     -- 2 PLAYER VS COMPUTER
     gamemode = ''
     
-    -- the state of our game; can be any of the following:
-    -- 1. 'start' (the beginning of the game, before first serve)
-    -- 2. 'serve' (waiting on a key press to serve the ball)
-    -- 3. 'play' (the ball is in play, bouncing between paddles)
-    -- 4. 'done' (the game is over, with a victor, ready for restart)
-    -- 5. 'menu' (this is the part where player picks the game mode)
+
+    --initiates the x and y position of the highlight indicator
+        --initiates the value for the menu idicator
+    indicatorX = VIRTUAL_WIDTH / 2 - 55
+    indicatorY = 49
+    indicatorChoice = 1
+
+    -- initiates the choice as left paddle
+    paddleChoice = 1
+    paddleIndicatorX = VIRTUAL_WIDTH/2 - 79
+    paddleIndicatorY = VIRTUAL_HEIGHT/2 - 21
+    paddleSide = ''
+    -- the state flow of our game; can be any of the following:
+
+    -- 1. 'menu' (this is the part where player picks the game mode)
+    -- 2. 'start' (the beginning of the game, before first serve)
+        -- if the user chose the pvc, will create a new state: paddle state(where player choose whether to use left or right paddle)
+    -- 3. 'serve' (waiting on a key press to serve the ball)
+    -- 4. 'play' (the ball is in play, bouncing between paddles)
+    -- 5. 'done' (the game is over, with a victor, ready for restart)
+
+    -- game modes are the following:
+    -- 1. Player vs Player(pvp)
+    -- 2. Player vs Computer(pvc)
     gameState = 'menu'
 end
 
@@ -241,7 +259,7 @@ function love.update(dt)
         end
         --
         -- paddles can't move in 'menu' state
-        -- checks if gamemode is player vs player
+        -- checks if gamemode is player vs player under play gamestate
         if gamemode == 'pvp' then
             -- player 1
             if love.keyboard.isDown('w') then
@@ -260,36 +278,65 @@ function love.update(dt)
             else
                 player2.dy = 0
             end
+        end
+        
+        --checks if game mode is player vs computer under play gamestate    
+        -- first checks if user chooses to play as player 1 or 2
+        -- player gets both inputs since opponent is not using the other controlls, more controlls for user
+        if gamemode == 'pvc' then
+            if paddleSide == 'left' then
+                -- player 1
+                if love.keyboard.isDown('w') or love.keyboard.isDown('up') then
+                    player1.dy = -PADDLE_SPEED
+                elseif love.keyboard.isDown('s') or love.keyboard.isDown('down') then
+                    player1.dy = PADDLE_SPEED
+                else
+                    player1.dy = 0
+                end
   
-        --checks if game mode is player vs computer    
-        elseif gamemode == 'pvc' then
-            -- player 1
-            if love.keyboard.isDown('w') then
-                player1.dy = -PADDLE_SPEED
-            elseif love.keyboard.isDown('s') then
-                player1.dy = PADDLE_SPEED
-            else
-                player1.dy = 0
-            end
-  
-            -- player 2
+            -- player 2(AI)
             -- AI will only move if the ball is coming towards it
             -- slight delay till the ball reaches an imaginary line(1/4 of the game width) to make the AI move
-            if ball.dx > 0 and ball.x >= VIRTUAL_WIDTH/4 then
-             
-         
-                if ball.x + ball.width > 0 and ball.x < VIRTUAL_WIDTH then
-                    if player2.y + player2.height/2 > ball.y + ball.height then
-                        player2.dy = -PADDLE_SPEED
-                    elseif player2.y + player2.height/2 < ball.y then
-                        player2.dy = PADDLE_SPEED
-                    else
-                        player2.dy = 0
-                    end
-                end                  
-            end
-           
+                if ball.dx > 0 and ball.x >= VIRTUAL_WIDTH/4 then
+                    if ball.x + ball.width > 0 and ball.x < VIRTUAL_WIDTH then
+                        if player2.y + player2.height/2 > ball.y + ball.height then
+                            -- the value of dy is 120 which is not so fast or not too slow, also makes the ai more beatable
+                            player2.dy = -120
+                        elseif player2.y + player2.height/2 < ball.y then
+                            player2.dy = 120
+                        else
+                            player2.dy = 0
+                        end
+                    end                  
+                end
+            
+            -- if user chose to play as player 2 or right side    
+            elseif paddleSide == 'right' then
+                --player 1(AI)
+                if ball.dx < 0 and ball.x <= VIRTUAL_WIDTH/2 + VIRTUAL_WIDTH/4 then
+                    if ball.x + ball.width > 0 and ball.x < VIRTUAL_WIDTH then
+                        if player1.y + player1.height/2 > ball.y + ball.height then
+                            -- the value of dy is 120 which is not so fast or not too slow, also makes the ai more beatable
+                            player1.dy = -120
+                        elseif player1.y + player1.height/2 < ball.y then
+                            player1.dy = 120
+                        else
+                            player1.dy = 0
+                        end
+                    end                  
+                end
+                
+                --player 2
+                if love.keyboard.isDown('w') or love.keyboard.isDown('up') then
+                    player2.dy = -PADDLE_SPEED
+                elseif love.keyboard.isDown('s') or love.keyboard.isDown('down') then
+                    player2.dy = PADDLE_SPEED
+                else
+                    player2.dy = 0
+                end
+            end     
         end
+
 
         -- update our ball based on its DX and DY only if we're in play state;
         -- scale the velocity by dt so movement is framerate-independent
@@ -299,6 +346,8 @@ function love.update(dt)
         player2:update(dt)
     end
 end
+    
+
 
 --[[
     A callback that processes key strokes as they happen, just the once.
@@ -308,8 +357,9 @@ end
 ]]
 function love.keypressed(key)
     -- `key` will be whatever key this callback detected as pressed
+    -- will not exit even if the game is still playing
     if key == 'escape' then
-        if gameState ~= 'menu' then
+        if gameState ~= 'menu'  and gameState ~= 'play' then
             ball:reset()
             -- reset scores to 0
             player1Score = 0
@@ -317,7 +367,7 @@ function love.keypressed(key)
             servingPlayer = 1
             gameState = 'menu'
 
-        else
+        elseif gameState == 'menu' then
             love.event.quit()
         end
     -- if we press enter during either the start or serve phase, it should
@@ -337,7 +387,10 @@ function love.keypressed(key)
             -- reset scores to 0
             player1Score = 0
             player2Score = 0
-
+            sounds['bgm']:setLooping(true)
+            sounds['bgm']:stop()
+            sounds['bgm']:play()
+            
             -- decide serving player as the opposite of who won
             if winningPlayer == 1 then
                 servingPlayer = 2
@@ -347,22 +400,74 @@ function love.keypressed(key)
         end
     end
     
+    -- changes as the position of the indicator moves per key
     if gameState == 'menu' then
-        if key == '1'  then
-            gamemode = 'pvp'
-            gameState = 'start'
-            sounds['bgm']:setLooping(true)
-            sounds['bgm']:stop()
-            sounds['bgm']:play()
-        elseif key == '2' then
-            sounds['bgm']:setLooping(true)
-            sounds['bgm']:stop()
-            sounds['bgm']:play()
-            gamemode = 'pvc'
-            gameState = 'start'
+        if key == 'down' then
+            if indicatorChoice >= 1 and indicatorChoice < 2 then
+                indicatorY = indicatorY + 10
+                indicatorChoice = indicatorChoice + 1
+            elseif indicatorChoice == 2 then
+                indicatorChoice = 1
+                indicatorY = indicatorY - 10
+            end
+        end
+
+        if key == 'up' then
+            if indicatorChoice == 2 then
+                indicatorY = indicatorY - 10
+                indicatorChoice = indicatorChoice - 1
+            elseif indicatorChoice == 1 then
+                indicatorY = indicatorY + 10
+                indicatorChoice = 2
+            end
+        end
+
+    -- confirm the choice of the user
+        if key == 'enter' or key == 'return' then
+            if indicatorChoice == 1  then
+                gamemode = 'pvp'
+                gameState = 'start'
+                sounds['bgm']:setLooping(true)
+                sounds['bgm']:stop()
+                sounds['bgm']:play()
+            elseif indicatorChoice == 2 then
+                gameState = 'paddle'
+            end
+        end
+    
+    -- in the paddle state, moves the paddle indicator
+    -- also confirms the choice of the user by clicking space or enter
+    elseif gameState == 'paddle' then
+        if key == 'left' or key == 'right' then
+            if paddleChoice == 1 then
+                paddleIndicatorX = VIRTUAL_WIDTH/2 + 16
+                paddleChoice = 2
+            elseif paddleChoice == 2 then
+                paddleIndicatorX = VIRTUAL_WIDTH/2 - 79
+                paddleChoice = 1
+            end
+        end
+
+        if  key == 'return' or key == 'space' or key == 'enter 'then
+            if paddleChoice == 1 then
+                paddleSide = 'left'
+                gamemode = 'pvc'
+                gameState = 'start'
+                sounds['bgm']:setLooping(true)
+                sounds['bgm']:stop()
+                sounds['bgm']:play()
+            elseif paddleChoice == 2 then
+                paddleSide = 'right'
+                gamemode = 'pvc'
+                gameState = 'start'
+                sounds['bgm']:setLooping(true)
+                sounds['bgm']:stop()
+                sounds['bgm']:play()
+            end
         end
     end
 end
+
 
 --[[
     Called each frame after update; is responsible simply for
@@ -377,18 +482,11 @@ function love.draw()
     -- render different things depending on which part of the game we're in
     if gameState == 'start' then
         -- UI messages
-        if gamemode == 'pvp' then
-            love.graphics.setFont(smallFont)
-            love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
-            love.graphics.printf('Press Enter or Space to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
-            love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
-        else
-            love.graphics.setFont(smallFont)
-            love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
-            love.graphics.printf('Player = Left Side \n Controls = W and S', 0, 20, VIRTUAL_WIDTH, 'center')
-            love.graphics.printf('Press Enter or Space to begin!', 0, 40, VIRTUAL_WIDTH, 'center')
-            love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
-        end
+        love.graphics.setFont(smallFont)
+        love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press Enter or Space to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+    
     elseif gameState == 'serve' then
         -- UI messages
         love.graphics.setFont(smallFont)
@@ -409,21 +507,52 @@ function love.draw()
 
     --for the menu
     elseif gameState == 'menu' then
+        -- for the choice indicator thingy that highlights the choice in the menu
+        love.graphics.setColor(65/255, 71/255, 67/255, 255)
+        love.graphics.rectangle('fill', indicatorX, indicatorY, 110, 10)
+        love.graphics.setColor(1, 1, 1, 1)
+
+        --menu texts
         love.graphics.setFont(largeFont)
         love.graphics.printf('Choose a mode',0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.setFont(smallFont)
-        love.graphics.printf('1. Player vs Player \n 2. Player vs Computer' , 0, 50, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Player vs Player' , 0, 50, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Player vs Computer', 0, 60, VIRTUAL_WIDTH, 'center')
         love.graphics.printf('Press escape to quit.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+
+
+    elseif gameState == 'paddle' then
+        drawPaddleCHOICE()
+    end
+
+    -- controls texts
+    if gameState == 'start' or gameState == 'serve' then
+        
+        love.graphics.setFont(smallFont)
+
+
+        if gamemode == 'pvp' then
+            love.graphics.printf('W - move up\nS - move down', 5, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'left')
+            love.graphics.print('UP KEY - move up\nDOWN KEY- move down', VIRTUAL_WIDTH - 100, VIRTUAL_HEIGHT - 20)
+        
+        elseif gamemode == 'pvc' then
+            if paddleSide == 'left' then
+                love.graphics.printf('W or UP - move up\nS or DOWN - move down', 5, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'left')
+            elseif paddleSide == 'right' then
+                love.graphics.print('W or UP - move up\nS or DOWN - move down', VIRTUAL_WIDTH - 105, VIRTUAL_HEIGHT - 20)
+            end
+        end
+
     end
 
     -- show the score before ball is rendered so it can move over the text
-    if gameState ~= 'menu' then
+    -- player, ball, and score will not display in menu and paddle states
+    if gameState ~= 'menu' and gameState ~= 'paddle' then
     displayScore()
     
     player1:render()
     player2:render()
     ball:render()
-
     end
 
     -- display FPS for debugging; simply comment out to remove
@@ -456,3 +585,18 @@ function displayFPS()
     love.graphics.setColor(1, 1, 1, 1)
 end
 
+
+function drawPaddleCHOICE()
+    love.graphics.setFont(smallFont)
+    love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Choose your preferred paddle', 0, 20, VIRTUAL_WIDTH, 'center')
+    
+    -- draws the indicator for the choices in paddle
+    love.graphics.setColor(65/255, 71/255, 67/255, 255)
+    love.graphics.rectangle('fill', paddleIndicatorX, paddleIndicatorY, 70, 18)
+    love.graphics.setColor(1, 1, 1, 1)
+
+    love.graphics.setFont(largeFont)
+    love.graphics.print('LEFT', VIRTUAL_WIDTH/2 - 60, VIRTUAL_HEIGHT/2 - 20)
+    love.graphics.print('RIGHT', VIRTUAL_WIDTH/2 + 30, VIRTUAL_HEIGHT/2 - 20)
+end
