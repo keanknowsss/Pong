@@ -301,9 +301,9 @@ function love.update(dt)
                     if ball.x + ball.width > 0 and ball.x < VIRTUAL_WIDTH then
                         if player2.y + player2.height/2 > ball.y + ball.height then
                             -- the value of dy is 120 which is not so fast or not too slow, also makes the ai more beatable
-                            player2.dy = -120
+                            player2.dy = -115
                         elseif player2.y + player2.height/2 < ball.y then
-                            player2.dy = 120
+                            player2.dy = 115
                         else
                             player2.dy = 0
                         end
@@ -317,9 +317,9 @@ function love.update(dt)
                     if ball.x + ball.width > 0 and ball.x < VIRTUAL_WIDTH then
                         if player1.y + player1.height/2 > ball.y + ball.height then
                             -- the value of dy is 120 which is not so fast or not too slow, also makes the ai more beatable
-                            player1.dy = -120
+                            player1.dy = -115
                         elseif player1.y + player1.height/2 < ball.y then
-                            player1.dy = 120
+                            player1.dy = 115
                         else
                             player1.dy = 0
                         end
