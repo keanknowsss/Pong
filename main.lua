@@ -489,21 +489,103 @@ function love.draw()
     
     elseif gameState == 'serve' then
         -- UI messages
-        love.graphics.setFont(smallFont)
-        love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
+        --FOR PVP
+        if gamemode == 'pvp' then
+            love.graphics.setFont(smallFont)
+            love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
             0, 10, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+            love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
+            love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+
+        --FOR PVC
+        elseif gamemode == 'pvc' then
+            --DISPLAY'S "COMPUTER'S SERVE" IF COMPUTER'S TURN
+            if paddleSide == 'left' then
+                if servingPlayer == 2 then
+                    love.graphics.setFont(smallFont)
+                    love.graphics.printf("Computer's serve!", 
+                    0, 10, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')        
+                else
+                    love.graphics.setFont(smallFont)
+                    love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
+                    0, 10, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')            
+                end
+            end
+
+            --DISPLAY'S "COMPUTER'S SERVE" IF COMPUTER'S TURN
+            if paddleSide == 'right' then
+                if servingPlayer == 1 then
+                    love.graphics.setFont(smallFont)
+                    love.graphics.printf("Computer's serve!", 
+                    0, 10, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')        
+                else
+                    love.graphics.setFont(smallFont)
+                    love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
+                    0, 10, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')            
+                end                
+            end
+        end
+        
     elseif gameState == 'play' then
         -- no UI messages to display in play
     elseif gameState == 'done' then
-        -- UI messages
-        love.graphics.setFont(largeFont)
-        love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
+        -- UI messages for player vs player
+        if gamemode == 'pvp' then
+            love.graphics.setFont(largeFont)
+            love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
             0, 10, VIRTUAL_WIDTH, 'center')
-        love.graphics.setFont(smallFont)
-        love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+            love.graphics.setFont(smallFont)
+            love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+            love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+
+        -- UI messages for player vs computer
+        elseif gamemode == 'pvc' then
+            if paddleSide == 'left' then
+                if winningPlayer == 2 then
+                    love.graphics.setFont(largeFont)
+                    love.graphics.printf('Computer wins!',
+                    0, 10, VIRTUAL_WIDTH, 'center')
+                    love.graphics.setFont(smallFont)
+                    love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+                else
+                    love.graphics.setFont(largeFont)
+                    love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
+                    0, 10, VIRTUAL_WIDTH, 'center')
+                    love.graphics.setFont(smallFont)
+                    love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+                end
+            end
+
+            if paddleSide == 'right' then
+                if winningPlayer == 1 then
+                    love.graphics.setFont(largeFont)
+                    love.graphics.printf('Computer wins!',
+                    0, 10, VIRTUAL_WIDTH, 'center')
+                    love.graphics.setFont(smallFont)
+                    love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+                else
+                    love.graphics.setFont(largeFont)
+                    love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
+                    0, 10, VIRTUAL_WIDTH, 'center')
+                    love.graphics.setFont(smallFont)
+                    love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+                end
+            end
+
+        end
+        
 
     --for the menu
     elseif gameState == 'menu' then
