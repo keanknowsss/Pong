@@ -301,13 +301,15 @@ function love.update(dt)
                     if ball.x + ball.width > 0 and ball.x < VIRTUAL_WIDTH then
                         if player2.y + player2.height/2 > ball.y + ball.height then
                             -- the value of dy is 120 which is not so fast or not too slow, also makes the ai more beatable
-                            player2.dy = -115
+                            player2.dy = -105
                         elseif player2.y + player2.height/2 < ball.y then
-                            player2.dy = 115
+                            player2.dy = 105
                         else
                             player2.dy = 0
                         end
-                    end                  
+                    end
+                else
+                    player2.dy = 0                  
                 end
             
             -- if user chose to play as player 2 or right side    
@@ -317,13 +319,15 @@ function love.update(dt)
                     if ball.x + ball.width > 0 and ball.x < VIRTUAL_WIDTH then
                         if player1.y + player1.height/2 > ball.y + ball.height then
                             -- the value of dy is 120 which is not so fast or not too slow, also makes the ai more beatable
-                            player1.dy = -115
+                            player1.dy = -105
                         elseif player1.y + player1.height/2 < ball.y then
-                            player1.dy = 115
+                            player1.dy = 105
                         else
                             player1.dy = 0
                         end
                     end                  
+                else
+                    player1.dy = 0
                 end
                 
                 --player 2
@@ -359,7 +363,7 @@ function love.keypressed(key)
     -- `key` will be whatever key this callback detected as pressed
     -- will not exit even if the game is still playing
     if key == 'escape' then
-        if gameState ~= 'menu'  and gameState ~= 'play' then
+        if gameState ~= 'menu'  and gameState ~= 'play' and gameState ~= 'serve' and gameState ~= 'start' then
             ball:reset()
             -- reset scores to 0
             player1Score = 0
@@ -369,6 +373,25 @@ function love.keypressed(key)
 
         elseif gameState == 'menu' then
             love.event.quit()
+        elseif gameState == 'start' or gameState == 'serve' then
+            if gamemode == 'pvp' then
+                ball:reset()
+                -- reset scores to 0
+                player1Score = 0
+                player2Score = 0
+                servingPlayer = 1
+                gameState = 'menu'
+            end
+
+            if gamemode == 'pvc' then
+                ball:reset()
+                -- reset scores to 0
+                player1Score = 0
+                player2Score = 0
+                servingPlayer = 1
+                gameState = 'paddle'
+            end
+
         end
     -- if we press enter during either the start or serve phase, it should
     -- transition to the next appropriate state
@@ -485,7 +508,13 @@ function love.draw()
         love.graphics.setFont(smallFont)
         love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.printf('Press Enter or Space to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+
+        if gamemode == 'pvp' then
+            love.graphics.printf('Press Escape to go back to Menu', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+        else
+            love.graphics.printf('Press Escape to change Paddle', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+        end
+        
     
     elseif gameState == 'serve' then
         -- UI messages
@@ -495,7 +524,7 @@ function love.draw()
             love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
             0, 10, VIRTUAL_WIDTH, 'center')
             love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
-            love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+            love.graphics.printf('Press Escape to go back to Menu', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
 
         --FOR PVC
         elseif gamemode == 'pvc' then
@@ -506,13 +535,13 @@ function love.draw()
                     love.graphics.printf("Computer's serve!", 
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
-                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')        
+                    love.graphics.printf('Press Escape to change Paddle', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')        
                 else
                     love.graphics.setFont(smallFont)
                     love.graphics.printf("Player's serve!", 
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
-                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')            
+                    love.graphics.printf('Press Escape to change Paddle', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')            
                 end
             end
 
@@ -523,13 +552,13 @@ function love.draw()
                     love.graphics.printf("Computer's serve!", 
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
-                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')        
+                    love.graphics.printf('Press Escape to change Paddle', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')        
                 else
                     love.graphics.setFont(smallFont)
                     love.graphics.printf("Player's serve!", 
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
-                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')            
+                    love.graphics.printf('Press Escape to change Paddle', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')            
                 end                
             end
         end
@@ -543,8 +572,8 @@ function love.draw()
             love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
             0, 10, VIRTUAL_WIDTH, 'center')
             love.graphics.setFont(smallFont)
-            love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
-            love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+            love.graphics.printf('Press Enter or Space to Restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+            love.graphics.printf('Press Escape to go back to Menu', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
 
         -- UI messages for player vs computer
         elseif gamemode == 'pvc' then
@@ -555,14 +584,14 @@ function love.draw()
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.setFont(smallFont)
                     love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
-                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
                 else
                     love.graphics.setFont(largeFont)
                     love.graphics.printf('Player wins!',
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.setFont(smallFont)
                     love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
-                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
                 end
             end
 
@@ -572,15 +601,15 @@ function love.draw()
                     love.graphics.printf('Computer wins!',
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.setFont(smallFont)
-                    love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
-                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Enter or Space to Restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
                 else
                     love.graphics.setFont(largeFont)
                     love.graphics.printf('Player wins!',
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.setFont(smallFont)
-                    love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
-                    love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Enter or Space to Restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+                    love.graphics.printf('Press Escape to go back to Menu', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
                 end
             end
 
@@ -600,7 +629,7 @@ function love.draw()
         love.graphics.setFont(smallFont)
         love.graphics.printf('Player vs Player' , 0, 50, VIRTUAL_WIDTH, 'center')
         love.graphics.printf('Player vs Computer', 0, 60, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press escape to quit.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press Escape to QUIT', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
 
 
     elseif gameState == 'paddle' then
@@ -671,8 +700,8 @@ end
 function drawPaddleCHOICE()
     love.graphics.setFont(smallFont)
     love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
-    love.graphics.printf('Choose your preferred paddle', 0, 20, VIRTUAL_WIDTH, 'center')
-    
+    love.graphics.printf('Choose your preferred Paddle', 0, 20, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Escape to go back to Menu', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
     -- draws the indicator for the choices in paddle
     love.graphics.setColor(65/255, 71/255, 67/255, 255)
     love.graphics.rectangle('fill', paddleIndicatorX, paddleIndicatorY, 70, 18)
