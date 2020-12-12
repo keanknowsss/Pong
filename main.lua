@@ -509,7 +509,7 @@ function love.draw()
                     love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')        
                 else
                     love.graphics.setFont(smallFont)
-                    love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
+                    love.graphics.printf("Player's serve!", 
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
                     love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')            
@@ -526,7 +526,7 @@ function love.draw()
                     love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')        
                 else
                     love.graphics.setFont(smallFont)
-                    love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
+                    love.graphics.printf("Player's serve!", 
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.printf('Press Enter or Space to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
                     love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')            
@@ -558,7 +558,7 @@ function love.draw()
                     love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
                 else
                     love.graphics.setFont(largeFont)
-                    love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
+                    love.graphics.printf('Player wins!',
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.setFont(smallFont)
                     love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
@@ -576,7 +576,7 @@ function love.draw()
                     love.graphics.printf('Press Escape to go back to Menu.', 0, VIRTUAL_HEIGHT - 20, VIRTUAL_WIDTH, 'center')
                 else
                     love.graphics.setFont(largeFont)
-                    love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
+                    love.graphics.printf('Player wins!',
                     0, 10, VIRTUAL_WIDTH, 'center')
                     love.graphics.setFont(smallFont)
                     love.graphics.printf('Press Enter or Space to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
