@@ -1,3 +1,3 @@
 # PONG
  
-Lecture-0
+Lesson-0
